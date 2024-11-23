@@ -17,6 +17,9 @@ const multerService = multer({ storage: mediaStorageOptions });
 app
   .route("/upload")
   .all(multerService.single("video"))
-  .post(VideoProcessController.uploadVideo);
+  .post(
+    VideoProcessController.processAndValidateFile,
+    VideoProcessController.insertVideoMetaData
+  );
 
 module.exports = app;

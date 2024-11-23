@@ -14,6 +14,8 @@ exports.initDb = () => {
                   id INTEGER PRIMARY KEY AUTOINCREMENT,
                   filename TEXT NOT NULL,
                   filepath TEXT NOT NULL,
+                  size INTEGER NOT NULL,
+                  duration INTEGER NOT NULL,
                   created_at DATETIME DEFAULT CURRENT_TIMESTAMP
                   )
               `);
