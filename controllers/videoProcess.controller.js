@@ -1,9 +1,8 @@
-const ffmpeg = require("fluent-ffmpeg");
-const Database = require("../database");
-const fs = require("fs");
 const AuthController = require("./auth.controller");
 const path = require("path");
+const fs = require("fs");
 const ffmpegUtils = require("../utils/ffmpegUtils");
+const VideoModel = require("../models/videos.model");
 
 exports.processAndValidateFile = async (req, res, next) => {
   try {
@@ -48,64 +47,49 @@ exports.processAndValidateFile = async (req, res, next) => {
   }
 };
 
-exports.insertVideoMetaData = (req, res) => {
-  const { filename, path, size, duration } = req.file;
+exports.insertVideoMetaData = async (req, res) => {
+  try {
+    const { filename, path, size, duration } = req.file;
 
-  Database.getDb().run(
-    "INSERT INTO videos (filename, filepath, size, duration) VALUES ($name,$path,$size,$duration)",
-    { $name: filename, $path: path, $size: size, $duration: duration },
-    function (err) {
-      if (err) {
-        console.error("Failed to insert file meta data into db");
-        return res
-          .status(500)
-          .send("Error while trying to save metadata into db ", err);
-      } else {
-        return res.status(200).send({ id: this.lastID });
-      }
-    }
-  );
+    const createdRowId = await VideoModel.createRow({
+      filename,
+      path,
+      size,
+      duration,
+    });
+    return res.status(200).send({ id: createdRowId });
+  } catch (err) {
+    return res
+      .status(500)
+      .send("Error while trying to save metadata into db ", err);
+  }
 };
 
 exports.getLinkToVideo = async (req, res) => {
-  const { id } = req.query;
+  try {
+    const { id } = req.query;
 
-  Database.getDb().get(
-    "SELECT * FROM videos WHERE ID=$id",
-    {
-      $id: id,
-    },
-    async function (err, row) {
-      if (err) {
-        console.error("Sqlite error : ", err);
-        return res.status(500).send({
-          message: "Error while fetching video metadata from db ",
-          error: err,
-        });
-      }
-
-      const filename = row.filename;
-      const filepath = row.filepath;
-
-      if (!fs.existsSync(filepath)) {
-        console.error("Couln't find file with id :", id);
-        return res
-          .status(404)
-          .send({ message: "Video not found with id " + id });
-      }
-
-      const token = await AuthController.generateTokenForVideoLink(
-        filename,
-        filepath
-      );
-
-      const resourceUrl = `${req.protocol}://${req.get(
-        "host"
-      )}/video/download/?token=${token}`;
-
-      res.status(200).send(resourceUrl);
+    if (!id) {
+      console.error("Missing id in request payload");
+      return res.status(400).send("Missing id in payload");
     }
-  );
+
+    const { filename, filepath } = await VideoModel.getRowById(id);
+
+    const token = await AuthController.generateTokenForVideoLink(
+      filename,
+      filepath
+    );
+
+    const resourceUrl = `${req.protocol}://${req.get(
+      "host"
+    )}/video/download/?token=${token}`;
+
+    res.status(200).send(resourceUrl);
+  } catch (err) {
+    console.error(err);
+    return res.status(500).send(err);
+  }
 };
 
 exports.getVideo = (req, res) => {
