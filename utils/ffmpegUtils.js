@@ -2,7 +2,6 @@ const ffmpeg = require("fluent-ffmpeg");
 
 exports.trim = (filepath, start, duration, outputpath) => {
   return new Promise((resolve, reject) => {
-    console.log("hii", ffmpeg);
     ffmpeg
       .input(filepath)
       .setStartTime(start)
@@ -17,5 +16,18 @@ exports.trim = (filepath, start, duration, outputpath) => {
         resolve();
       })
       .run();
+  });
+};
+
+exports.getMetaData = (filepath) => {
+  return new Promise((resolve, reject) => {
+    ffmpeg.ffprobe(filepath, (err, metaData) => {
+      if (err) {
+        console.error("FFmpeg Error : ", err);
+        return reject(err);
+      } else {
+        return resolve(metaData);
+      }
+    });
   });
 };

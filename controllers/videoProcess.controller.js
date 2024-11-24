@@ -2,64 +2,58 @@ const ffmpeg = require("fluent-ffmpeg");
 const Database = require("../database");
 const fs = require("fs");
 const AuthController = require("./auth.controller");
+const path = require("path");
+const ffmpegUtils = require("../utils/ffmpegUtils");
 
-exports.processAndValidateFile = (req, res, next) => {
-  const { path, size } = req.file;
-  const maxFileSize = process.env.MAX_UPLOAD_FILE_SIZE || 25; // in mb
-  const minDuration = process.env.MIN_VIDEO_DURATION || 0;
-  const maxDuration = process.env.MAX_VIDOE_DURATION || 25;
+exports.processAndValidateFile = async (req, res, next) => {
+  try {
+    const { path, size } = req.file;
 
-  if (size > maxFileSize * 1024 * 1024) {
-    fs.unlinkSync(path);
-    return res
-      .status(400)
-      .send(
+    const maxFileSize = process.env.MAX_UPLOAD_FILE_SIZE || 25; // in mb
+    const minDuration = process.env.MIN_VIDEO_DURATION || 0;
+    const maxDuration = process.env.MAX_VIDEO_DURATION || 25;
+
+    if (size > maxFileSize * 1024 * 1024) {
+      throw new Error(
         "File size is too large. Upload a video less than " + maxFileSize + "mb"
       );
-  }
-  let duration = 0;
-  ffmpeg.ffprobe(path, (err, metaData) => {
-    if (err) {
-      fs.unlinkSync(path);
-      console.error("FFmpeg error : ", err);
-      return res.status(500).send("Error with ffmpeg ", err);
     }
+    let duration = 0;
 
-    duration = metaData.format.duration;
+    const fileMetaData = await ffmpegUtils.getMetaData(path);
+    duration = fileMetaData.format.duration;
 
     if (duration > maxDuration) {
-      fs.unlinkSync(path);
-      return res
-        .status(400)
-        .send(
-          "File duration is too large. Upload a video less than " +
-            maxDuration +
-            " secs"
-        );
+      throw new Error(
+        "File duration is too large. Upload a video less than " +
+          maxDuration +
+          " secs"
+      );
     }
 
     if (duration < minDuration) {
-      fs.unlinkSync(path);
-      return res
-        .status(400)
-        .send(
-          "File duration is too small. Upload a video greater than " +
-            minDuration +
-            " secs"
-        );
+      throw new Error(
+        "File duration is too small. Upload a video greater than " +
+          minDuration +
+          " secs"
+      );
     }
 
     req.file.duration = duration;
     return next();
-  });
+  } catch (err) {
+    fs.unlinkSync(path);
+    console.error(err);
+    return res.status(400).send(err);
+  }
 };
 
 exports.insertVideoMetaData = (req, res) => {
   const { filename, path, size, duration } = req.file;
 
   Database.getDb().run(
-    "INSERT INTO videos (filename, filepath) VALUES ($name,$path)",
-    { $name: filename, $path: path },
+    "INSERT INTO videos (filename, filepath, size, duration) VALUES ($name,$path,$size,$duration)",
+    { $name: filename, $path: path, $size: size, $duration: duration },
     function (err) {
       if (err) {
         console.error("Failed to insert file meta data into db");
