@@ -1,10 +1,14 @@
 const {
   processAndValidateFile,
   insertVideoMetaData,
+  getLinkToVideo,
+  getVideo,
 } = require("../../../controllers/videoProcess.controller");
+const AuthController = require("../../../controllers/auth.controller");
 const fs = require("fs");
 const Database = require("../../../database");
 
+jest.mock("../../../controllers/auth.controller");
 jest.mock("../../../database");
 jest.mock("fs");
 
@@ -145,5 +149,127 @@ describe("insertVideoMetaData", () => {
       "Error while trying to save metadata into db ",
       new Error("Database error")
     );
+  });
+});
+
+describe("getLinkToVideo", () => {
+  let req, res;
+
+  beforeEach(() => {
+    req = {
+      query: {
+        id: 1,
+      },
+      protocol: "http",
+      get: () => "localhost:8080",
+    };
+    res = {
+      status: jest.fn().mockReturnThis(),
+      send: jest.fn(),
+    };
+
+    Database.getDb.mockReturnValue({
+      get: jest.fn(),
+    });
+  });
+
+  it("should return 500 if database error occurs", async () => {
+    const dbMock = Database.getDb();
+    dbMock.get.mockImplementation((query, params, callback) => {
+      callback(new Error("Database error"));
+    });
+
+    jest.spyOn(console, "error").mockImplementationOnce(() => {});
+
+    await getLinkToVideo(req, res);
+
+    expect(dbMock.get).toHaveBeenCalled();
+    expect(res.status).toHaveBeenCalledWith(500);
+    expect(res.send).toHaveBeenCalledWith({
+      message: "Error while fetching video metadata from db ",
+      error: new Error("Database error"),
+    });
+  });
+
+  it("should return 404 if file does not exist", async () => {
+    const dbMock = Database.getDb();
+    dbMock.get.mockImplementation((query, params, callback) => {
+      callback(null, { filename: "video.mp4", filepath: "./video.mp4" });
+    });
+
+    jest.spyOn(console, "error").mockImplementationOnce(() => {});
+    fs.existsSync.mockReturnValue(false);
+
+    await getLinkToVideo(req, res);
+
+    expect(res.status).toHaveBeenCalledWith(404);
+    expect(res.send).toHaveBeenCalledWith({
+      message: "Video not found with id 1",
+    });
+  });
+
+  it("should return video link if token generation is successful", async () => {
+    const dbMock = Database.getDb();
+    dbMock.get.mockImplementation((query, params, callback) => {
+      callback(null, { filename: "video.mp4", filepath: "./video.mp4" });
+    });
+
+    fs.existsSync.mockReturnValue(true);
+    AuthController.generateTokenForVideoLink.mockResolvedValue("mockToken");
+
+    req.query.id = 1;
+
+    await getLinkToVideo(req, res);
+
+    expect(AuthController.generateTokenForVideoLink).toHaveBeenCalledWith(
+      "video.mp4",
+      "./video.mp4"
+    );
+    expect(res.status).toHaveBeenCalledWith(200);
+    expect(res.send).toHaveBeenCalledWith(
+      "http://localhost:8080/video/download/?token=mockToken"
+    );
+  });
+});
+
+describe("getVideo", () => {
+  let req, res;
+
+  beforeEach(() => {
+    req = {
+      query: {
+        filename: "video.mp4",
+        filepath: "./video.mp4",
+      },
+    };
+    res = {
+      status: jest.fn().mockReturnThis(),
+      send: jest.fn(),
+    };
+
+    Database.getDb.mockReturnValue({
+      get: jest.fn(),
+    });
+  });
+
+  it("should return 404 if file does not exist", () => {
+    fs.existsSync.mockReturnValue(false);
+
+    jest.spyOn(console, "error").mockImplementationOnce(() => {});
+
+    getVideo(req, res);
+
+    expect(res.status).toHaveBeenCalledWith(404);
+    expect(res.send).toHaveBeenCalledWith({ message: "Video not found" });
+  });
+
+  it("should send file if it exists", () => {
+    fs.existsSync.mockReturnValue(true);
+
+    res.sendFile = jest.fn();
+
+    getVideo(req, res);
+
+    expect(res.sendFile).toHaveBeenCalledWith("./video.mp4");
   });
 });
