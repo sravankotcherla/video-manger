@@ -1,16 +1,15 @@
-const path = require("path");
 const fs = require("fs");
 const ffmpegUtils = require("../../utils/ffmpegUtils");
 const VideoModel = require("../models/videos.model");
 
 exports.processAndValidateFile = async (req, res, next) => {
+  const { path, size } = req.file;
+
+  const maxFileSize = process.env.MAX_UPLOAD_FILE_SIZE || 25; // in mb
+  const minDuration = process.env.MIN_VIDEO_DURATION || 0;
+  const maxDuration = process.env.MAX_VIDEO_DURATION || 25;
+
   try {
-    const { path, size } = req.file;
-
-    const maxFileSize = process.env.MAX_UPLOAD_FILE_SIZE || 25; // in mb
-    const minDuration = process.env.MIN_VIDEO_DURATION || 0;
-    const maxDuration = process.env.MAX_VIDEO_DURATION || 25;
-
     if (size > maxFileSize * 1024 * 1024) {
       throw new Error(
         "File size is too large. Upload a video less than " + maxFileSize + "mb"
@@ -42,7 +41,7 @@ exports.processAndValidateFile = async (req, res, next) => {
   } catch (err) {
     fs.unlinkSync(path);
     console.error(err);
-    return res.status(400).send(err);
+    return res.status(400).send(err.message);
   }
 };
 

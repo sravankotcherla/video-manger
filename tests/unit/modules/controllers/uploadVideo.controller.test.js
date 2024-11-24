@@ -54,10 +54,10 @@ describe("Video Controller", () => {
 
       await processAndValidateFile(req, res, mockNext);
 
-      // expect(fs.unlinkSync).toHaveBeenCalledWith(req.file.path);
+      expect(fs.unlinkSync).toHaveBeenCalledWith(req.file.path);
       expect(res.status).toHaveBeenCalledWith(400);
       expect(res.send).toHaveBeenCalledWith(
-        new Error("File size is too large. Upload a video less than 25mb")
+        "File size is too large. Upload a video less than 25mb"
       );
     });
 
@@ -70,12 +70,10 @@ describe("Video Controller", () => {
       await processAndValidateFile(req, res, mockNext);
 
       expect(ffmpegUtils.getMetaData).toHaveBeenCalledWith(req.file.path);
-      // expect(fs.unlinkSync).toHaveBeenCalledWith(req.file.path);
+      expect(fs.unlinkSync).toHaveBeenCalledWith(req.file.path);
       expect(res.status).toHaveBeenCalledWith(400);
       expect(res.send).toHaveBeenCalledWith(
-        new Error(
-          "File duration is too large. Upload a video less than 30 secs"
-        )
+        "File duration is too large. Upload a video less than 30 secs"
       );
     });
 
@@ -88,12 +86,10 @@ describe("Video Controller", () => {
       await processAndValidateFile(req, res, mockNext);
 
       expect(ffmpegUtils.getMetaData).toHaveBeenCalledWith(req.file.path);
-      // expect(fs.unlinkSync).toHaveBeenCalledWith(req.file.path);
+      expect(fs.unlinkSync).toHaveBeenCalledWith(req.file.path);
       expect(res.status).toHaveBeenCalledWith(400);
       expect(res.send).toHaveBeenCalledWith(
-        new Error(
-          "File duration is too small. Upload a video greater than 5 secs"
-        )
+        "File duration is too small. Upload a video greater than 5 secs"
       );
     });
 
@@ -106,9 +102,9 @@ describe("Video Controller", () => {
       await processAndValidateFile(req, res, mockNext);
 
       expect(ffmpegUtils.getMetaData).toHaveBeenCalledWith(req.file.path);
-      // expect(fs.unlinkSync).toHaveBeenCalledWith(req.file.path);
+      expect(fs.unlinkSync).toHaveBeenCalledWith(req.file.path);
       expect(res.status).toHaveBeenCalledWith(400);
-      expect(res.send).toHaveBeenCalledWith(new Error("FFmpeg error"));
+      expect(res.send).toHaveBeenCalledWith("FFmpeg error");
     });
   });
 

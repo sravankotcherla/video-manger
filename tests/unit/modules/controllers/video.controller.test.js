@@ -18,6 +18,12 @@ jest.mock("../../../../modules/controllers/auth.controller", () => ({
   generateTokenForVideoLink: jest.fn(),
 }));
 
+jest.spyOn(console, "error").mockImplementation(() => {});
+
+afterAll(() => {
+  jest.restoreAllMocks();
+});
+
 describe("Video Controller", () => {
   describe("getLinkToVideo", () => {
     let req, res;

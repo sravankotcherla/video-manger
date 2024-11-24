@@ -64,6 +64,7 @@ describe("Video Upload API", () => {
     if (!fs.existsSync(testLargeVideoPath)) {
       console.error("test case failed. File not found at ", testLargeVideoPath);
     }
+    jest.spyOn(console, "error").mockImplementationOnce(() => {});
 
     const response = await request(server)
       .post("/video/upload")
@@ -82,6 +83,7 @@ describe("Video Upload API", () => {
     if (!fs.existsSync(testShortVideoPath)) {
       console.error("test case failed. File not found at ", testShortVideoPath);
     }
+    jest.spyOn(console, "error").mockImplementationOnce(() => {});
 
     const response = await request(server)
       .post("/video/upload")
@@ -97,6 +99,7 @@ describe("Video Upload API", () => {
     if (!fs.existsSync(testLongVideoPath)) {
       console.error("test case failed. File not found at ", testLongVideoPath);
     }
+    jest.spyOn(console, "error").mockImplementationOnce(() => {});
 
     const response = await request(server)
       .post("/video/upload")
