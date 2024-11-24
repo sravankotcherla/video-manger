@@ -20,7 +20,7 @@ exports.processAndValidateFile = (req, res, next) => {
   ffmpeg.ffprobe(path, (err, metaData) => {
     if (err) {
       fs.unlinkSync(path);
-      console.log("FFmpeg error : ", err);
+      console.error("FFmpeg error : ", err);
       return res.status(500).send("Error with ffmpeg ", err);
     }
 
@@ -47,6 +47,7 @@ exports.processAndValidateFile = (req, res, next) => {
             " secs"
         );
     }
+
     req.file.duration = duration;
     return next();
   });
@@ -60,7 +61,7 @@ exports.insertVideoMetaData = (req, res) => {
     { $name: filename, $path: path },
     function (err) {
       if (err) {
-        console.log("Failed to insert file meta data into db");
+        console.error("Failed to insert file meta data into db");
         return res
           .status(500)
           .send("Error while trying to save metadata into db ", err);

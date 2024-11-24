@@ -3,7 +3,7 @@ const mockGet = jest.fn();
 const mockAll = jest.fn();
 const mockClose = jest.fn();
 
-const mockDatabase = jest.fn(() => ({
+const mockDb = jest.fn(() => ({
   run: mockRun,
   get: mockGet,
   all: mockAll,
@@ -11,11 +11,10 @@ const mockDatabase = jest.fn(() => ({
 }));
 
 const mockVerbose = jest.fn(() => ({
-  Database: mockDatabase,
+  Database: mockDb,
 }));
 
 const sqlite3 = {
-  Database: mockDatabase,
   verbose: mockVerbose,
 };
 

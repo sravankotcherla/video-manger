@@ -5,7 +5,7 @@ exports.initDb = () => {
   return new Promise((resolve, reject) => {
     db = new sqlite.Database("./database.db", (err) => {
       if (err) {
-        console.log(err);
+        console.error(err);
         reject(err);
       } else {
         console.log("Connected to db");
