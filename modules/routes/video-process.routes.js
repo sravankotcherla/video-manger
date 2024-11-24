@@ -31,6 +31,8 @@ app
   .all(AuthController.authorizeLink)
   .get(VideoController.getVideo);
 
+app.use("/", AuthController.authenticate);
+
 app
   .route("/upload")
   .all(multerService.single("video"))

@@ -36,3 +36,18 @@ exports.authorizeLink = (req, res, next) => {
     return next(null);
   });
 };
+
+exports.authenticate = (req, res, next) => {
+  const AUTH_TOKEN = process.env.AUTH_TOKEN;
+  const token = req.headers["authorization"];
+
+  if (!token) {
+    return res.status(401).json({ message: "Missing authorization token" });
+  }
+
+  if (token !== `Bearer ${AUTH_TOKEN}`) {
+    return res.status(403).json({ message: "Invalid authorization token" });
+  }
+
+  next();
+};
