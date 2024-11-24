@@ -3,6 +3,7 @@ const multer = require("multer");
 const path = require("path");
 const UploadVideoController = require("../controllers/uploadVideo.controller");
 const VideoController = require("../controllers/video.controller");
+const VideoTrimController = require("../controllers/videoTrim.controller");
 
 const AuthController = require("../controllers/auth.controller");
 
@@ -23,8 +24,6 @@ const mediaStorageOptions = multer.diskStorage({
 });
 const multerService = multer({ storage: mediaStorageOptions });
 
-// app.route("/trim").all(VideoProcessController.trim);
-
 app
   .route("/download/")
   .all(AuthController.authorizeLink)
@@ -37,6 +36,8 @@ app
     UploadVideoController.processAndValidateFile,
     UploadVideoController.insertVideoMetaData
   );
+
+app.route("/trim").all(VideoTrimController.trim);
 
 app.route("/link").get(VideoController.getLinkToVideo);
 

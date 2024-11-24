@@ -1,6 +1,7 @@
 const express = require("express");
 const fs = require("fs");
 const path = require("path");
+const bodyParser = require("body-parser");
 
 const env = process.env.NODE_ENV;
 
@@ -11,7 +12,7 @@ if (env === "test") {
 }
 
 const Database = require("./database");
-const VideoProcessRouter = require("./routes/video-process.routes");
+const VideoProcessRouter = require("./modules/routes/video-process.routes");
 
 const port = process.env.PORT;
 const uploadFolderName = process.env.UPLOAD_FOLDER_NAME || "media";
@@ -20,6 +21,9 @@ const uploadFolderPath =
     ? path.join(__dirname, "./tests/e2e/", uploadFolderName)
     : path.join(__dirname, uploadFolderName);
 const app = express();
+
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: true }));
 
 let server;
 const initServer = async () => {
@@ -30,6 +34,10 @@ const initServer = async () => {
   return Database.initDb()
     .then((db) => {
       app.use("/video", VideoProcessRouter);
+
+      app.use((req, res) => {
+        res.status(404).send({ error: "Not Found" });
+      });
 
       server = app.listen(port, () => {
         console.log("Server listening on port ", port);

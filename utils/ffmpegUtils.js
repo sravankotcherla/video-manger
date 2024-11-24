@@ -2,8 +2,7 @@ const ffmpeg = require("fluent-ffmpeg");
 
 exports.trim = (filepath, start, duration, outputpath) => {
   return new Promise((resolve, reject) => {
-    ffmpeg
-      .input(filepath)
+    ffmpeg(filepath)
       .setStartTime(start)
       .setDuration(duration)
       .output(outputpath)
