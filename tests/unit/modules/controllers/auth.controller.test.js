@@ -2,7 +2,7 @@ const jwt = require("jsonwebtoken");
 const {
   generateTokenForVideoLink,
   authorizeLink,
-} = require("../../../controllers/auth.controller");
+} = require("../../../../modules/controllers/auth.controller");
 
 jest.mock("jsonwebtoken");
 
