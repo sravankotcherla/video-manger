@@ -1,7 +1,7 @@
 const ffmpeg = require("fluent-ffmpeg");
 const Database = require("../database");
 const fs = require("fs");
-const path = require("path");
+const AuthController = require("./auth.controller");
 
 exports.processAndValidateFile = (req, res, next) => {
   const { path, size } = req.file;
@@ -73,7 +73,7 @@ exports.insertVideoMetaData = (req, res) => {
   );
 };
 
-exports.getLinkToVideo = (req, res) => {
+exports.getLinkToVideo = async (req, res) => {
   const { id } = req.query;
 
   Database.getDb().get(
@@ -81,7 +81,7 @@ exports.getLinkToVideo = (req, res) => {
     {
       $id: id,
     },
-    function (err, row) {
+    async function (err, row) {
       if (err) {
         console.error("Sqlite error : ", err);
         return res.status(500).send({
@@ -92,6 +92,7 @@ exports.getLinkToVideo = (req, res) => {
 
       const filename = row.filename;
       const filepath = row.filepath;
+
       if (!fs.existsSync(filepath)) {
         console.error("Couln't find file with id :", id);
         return res
@@ -99,9 +100,14 @@ exports.getLinkToVideo = (req, res) => {
           .send({ message: "Video not found with id " + id });
       }
 
+      const token = await AuthController.generateTokenForVideoLink(
+        filename,
+        filepath
+      );
+
       const resourceUrl = `${req.protocol}://${req.get(
         "host"
-      )}/video/download/${filename}}`;
+      )}/video/download/?token=${token}`;
 
       res.status(200).send(resourceUrl);
     }
@@ -109,17 +115,12 @@ exports.getLinkToVideo = (req, res) => {
 };
 
 exports.getVideo = (req, res) => {
-  const { filename } = req.params;
+  const { filename, filepath } = req.query;
 
-  const filepath = path.resolve(
-    __dirname,
-    "../",
-    process.env.UPLOAD_FOLDER_NAME,
-    filename
-  );
   if (!fs.existsSync(filepath)) {
     console.error("Couln't find file with name :", filename);
     return res.status(404).send({ message: "Video not found" });
   }
+
   return res.sendFile(filepath);
 };

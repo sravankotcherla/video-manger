@@ -2,6 +2,7 @@ const express = require("express");
 const multer = require("multer");
 const path = require("path");
 const VideoProcessController = require("../controllers/videoProcess.controller");
+const AuthController = require("../controllers/auth.controller");
 
 const app = express();
 const uploadFolderName = process.env.UPLOAD_FOLDER_NAME || "media";
@@ -20,7 +21,10 @@ const mediaStorageOptions = multer.diskStorage({
 });
 const multerService = multer({ storage: mediaStorageOptions });
 
-app.get("/download/:filename", VideoProcessController.getVideo);
+app
+  .route("/download/")
+  .all(AuthController.authorizeLink)
+  .get(VideoProcessController.getVideo);
 
 app
   .route("/upload")
