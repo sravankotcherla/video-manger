@@ -41,9 +41,9 @@ app
     UploadVideoController.insertVideoMetaData
   );
 
-app.route("/trim").all(VideoTrimController.trim);
+app.route("/:id/trim").all(VideoTrimController.trim);
 
-app.route("/link").get(VideoController.getLinkToVideo);
+app.route("/:id/link").get(VideoController.getLinkToVideo);
 
 app.route("/merge").post(VideoMergeController.mergeVideos);
 

@@ -33,7 +33,7 @@ const initServer = async () => {
 
   return Database.initDb()
     .then((db) => {
-      app.use("/video", VideoProcessRouter);
+      app.use("/videos", VideoProcessRouter);
 
       app.use((req, res) => {
         res.status(404).send({ error: "Not Found" });

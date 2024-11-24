@@ -4,7 +4,7 @@ const VideoModel = require("../models/videos.model");
 
 exports.getLinkToVideo = async (req, res) => {
   try {
-    const { id } = req.query;
+    const { id } = req.params;
 
     if (!id) {
       console.error("Missing id in request payload");
@@ -20,7 +20,7 @@ exports.getLinkToVideo = async (req, res) => {
 
     const resourceUrl = `${req.protocol}://${req.get(
       "host"
-    )}/video/download/?token=${token}`;
+    )}/videos/download/?token=${token}`;
 
     res.status(200).send(resourceUrl);
   } catch (err) {

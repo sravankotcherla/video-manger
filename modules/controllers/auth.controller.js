@@ -38,6 +38,9 @@ exports.authorizeLink = (req, res, next) => {
 };
 
 exports.authenticate = (req, res, next) => {
+  if (process.env.DISABLE_AUTH == "true") {
+    return next();
+  }
   const AUTH_TOKEN = process.env.AUTH_TOKEN;
   const token = req.headers["authorization"];
 

@@ -52,8 +52,9 @@ describe("Video Upload API", () => {
     }
 
     const response = await request(server)
-      .post(`/video/upload`)
-      .attach("video", testVideoPath);
+      .post(`/videos/upload`)
+      .attach("video", testVideoPath)
+      .set("Authorization", `Bearer ${process.env.AUTH_TOKEN}`);
     expect(response.status).toBe(200);
     expect(response.body).toHaveProperty("id");
   });
@@ -67,8 +68,9 @@ describe("Video Upload API", () => {
     jest.spyOn(console, "error").mockImplementationOnce(() => {});
 
     const response = await request(server)
-      .post("/video/upload")
-      .attach("video", testLargeVideoPath);
+      .post("/videos/upload")
+      .attach("video", testLargeVideoPath)
+      .set("Authorization", `Bearer ${process.env.AUTH_TOKEN}`);
 
     expect(response.status).toBe(400);
     expect(response.text).toContain("File size is too large");
@@ -86,8 +88,9 @@ describe("Video Upload API", () => {
     jest.spyOn(console, "error").mockImplementationOnce(() => {});
 
     const response = await request(server)
-      .post("/video/upload")
-      .attach("video", testShortVideoPath);
+      .post("/videos/upload")
+      .attach("video", testShortVideoPath)
+      .set("Authorization", `Bearer ${process.env.AUTH_TOKEN}`);
 
     expect(response.status).toBe(400);
     expect(response.text).toContain("File duration is too small");
@@ -102,8 +105,9 @@ describe("Video Upload API", () => {
     jest.spyOn(console, "error").mockImplementationOnce(() => {});
 
     const response = await request(server)
-      .post("/video/upload")
-      .attach("video", testLongVideoPath);
+      .post("/videos/upload")
+      .attach("video", testLongVideoPath)
+      .set("Authorization", `Bearer ${process.env.AUTH_TOKEN}`);
 
     expect(response.status).toBe(400);
     expect(response.text).toContain("File duration is too large");

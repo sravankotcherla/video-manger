@@ -6,7 +6,8 @@ const ffmpegUtils = require("../../utils/ffmpegUtils");
 
 exports.trim = async (req, res) => {
   try {
-    let { id, start, duration } = req.body;
+    let { id } = req.params;
+    let { start, duration } = req.body;
 
     if (!id || !start || !duration) {
       return res

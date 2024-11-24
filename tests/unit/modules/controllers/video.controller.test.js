@@ -30,7 +30,7 @@ describe("Video Controller", () => {
 
     beforeEach(() => {
       req = {
-        query: { id: "1" },
+        params: { id: "1" },
         protocol: "http",
         get: jest.fn().mockReturnValue("localhost:3000"),
       };
@@ -49,7 +49,7 @@ describe("Video Controller", () => {
       await getLinkToVideo(req, res);
 
       const expectedUrl =
-        "http://localhost:3000/video/download/?token=mock-token";
+        "http://localhost:3000/videos/download/?token=mock-token";
       expect(VideoModel.getRowById).toHaveBeenCalledWith("1");
       expect(AuthController.generateTokenForVideoLink).toHaveBeenCalledWith(
         "video.mp4",
@@ -60,7 +60,7 @@ describe("Video Controller", () => {
     });
 
     it("should return 400 for missing id in request payload", async () => {
-      req.query = {};
+      req.params = {};
 
       await getLinkToVideo(req, res);
 

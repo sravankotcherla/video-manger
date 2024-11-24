@@ -20,8 +20,10 @@ describe("trim controller", () => {
 
   beforeEach(() => {
     mockReq = {
-      body: {
+      params: {
         id: 1,
+      },
+      body: {
         start: 5,
         duration: 10,
       },
