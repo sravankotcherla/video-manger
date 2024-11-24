@@ -20,6 +20,8 @@ const mediaStorageOptions = multer.diskStorage({
 });
 const multerService = multer({ storage: mediaStorageOptions });
 
+app.get("/download/:filename", VideoProcessController.getVideo);
+
 app
   .route("/upload")
   .all(multerService.single("video"))
@@ -27,5 +29,7 @@ app
     VideoProcessController.processAndValidateFile,
     VideoProcessController.insertVideoMetaData
   );
+
+app.route("/link").get(VideoProcessController.getLinkToVideo);
 
 module.exports = app;

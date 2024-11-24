@@ -1,6 +1,7 @@
 const ffmpeg = require("fluent-ffmpeg");
 const Database = require("../database");
 const fs = require("fs");
+const path = require("path");
 
 exports.processAndValidateFile = (req, res, next) => {
   const { path, size } = req.file;
@@ -70,4 +71,55 @@ exports.insertVideoMetaData = (req, res) => {
       }
     }
   );
+};
+
+exports.getLinkToVideo = (req, res) => {
+  const { id } = req.query;
+
+  Database.getDb().get(
+    "SELECT * FROM videos WHERE ID=$id",
+    {
+      $id: id,
+    },
+    function (err, row) {
+      if (err) {
+        console.error("Sqlite error : ", err);
+        return res.status(500).send({
+          message: "Error while fetching video metadata from db ",
+          error: err,
+        });
+      }
+
+      const filename = row.filename;
+      const filepath = row.filepath;
+      if (!fs.existsSync(filepath)) {
+        console.error("Couln't find file with id :", id);
+        return res
+          .status(404)
+          .send({ message: "Video not found with id " + id });
+      }
+
+      const resourceUrl = `${req.protocol}://${req.get(
+        "host"
+      )}/video/download/${filename}}`;
+
+      res.status(200).send(resourceUrl);
+    }
+  );
+};
+
+exports.getVideo = (req, res) => {
+  const { filename } = req.params;
+
+  const filepath = path.resolve(
+    __dirname,
+    "../",
+    process.env.UPLOAD_FOLDER_NAME,
+    filename
+  );
+  if (!fs.existsSync(filepath)) {
+    console.error("Couln't find file with name :", filename);
+    return res.status(404).send({ message: "Video not found" });
+  }
+  return res.sendFile(filepath);
 };
