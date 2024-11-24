@@ -11,7 +11,7 @@ const uploadFolderName = process.env.UPLOAD_FOLDER_NAME || "media";
 const uploadFolderPath =
   process.env.NODE_ENV === "test"
     ? path.join(__dirname, "../tests/e2e/", uploadFolderName)
-    : path.join(__dirname, "../", uploadFolderName);
+    : path.join(__dirname, "../../", uploadFolderName);
 
 console.log(uploadFolderPath);
 const mediaStorageOptions = multer.diskStorage({

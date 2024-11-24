@@ -1,6 +1,6 @@
 const path = require("path");
 const fs = require("fs");
-const ffmpegUtils = require("../utils/ffmpegUtils");
+const ffmpegUtils = require("../../utils/ffmpegUtils");
 const VideoModel = require("../models/videos.model");
 
 exports.processAndValidateFile = async (req, res, next) => {

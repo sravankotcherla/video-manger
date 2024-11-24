@@ -1,4 +1,4 @@
-const Database = require("../database");
+const Database = require("../../database");
 const fs = require("fs");
 
 exports.createRow = (rowData) => {
