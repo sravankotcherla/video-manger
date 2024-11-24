@@ -137,4 +137,79 @@ describe("Database Operations", () => {
       expect(fs.existsSync).toHaveBeenCalledWith("/uploads/video.mp4");
     });
   });
+
+  const Database = require("../../../../database");
+  const { getRowsByIds } = require("../../../../modules/models/videos.model");
+
+  jest.mock("../../../../database", () => ({
+    getDb: jest.fn(() => ({
+      all: jest.fn(),
+    })),
+  }));
+
+  describe("getRowsByIds", () => {
+    it("should return rows for valid ids", async () => {
+      const mockAll = jest.fn((query, params, callback) =>
+        callback(null, [
+          {
+            id: 1,
+            filename: "video1.mp4",
+            filepath: "/uploads/video1.mp4",
+            size: 123456,
+            duration: 60,
+          },
+          {
+            id: 2,
+            filename: "video2.mp4",
+            filepath: "/uploads/video2.mp4",
+            size: 789012,
+            duration: 120,
+          },
+        ])
+      );
+      Database.getDb.mockReturnValue({ all: mockAll });
+
+      const ids = [1, 2];
+      const result = await getRowsByIds(ids);
+
+      expect(result).toEqual([
+        {
+          id: 1,
+          filename: "video1.mp4",
+          filepath: "/uploads/video1.mp4",
+          size: 123456,
+          duration: 60,
+        },
+        {
+          id: 2,
+          filename: "video2.mp4",
+          filepath: "/uploads/video2.mp4",
+          size: 789012,
+          duration: 120,
+        },
+      ]);
+    });
+
+    it("should reject with an error if the query fails", async () => {
+      const mockAll = jest.fn((query, params, callback) =>
+        callback(new Error("DB Error"), null)
+      );
+      Database.getDb.mockReturnValue({ all: mockAll });
+      jest.spyOn(console, "error").mockImplementationOnce(() => {});
+
+      const ids = [1, 2];
+
+      await expect(getRowsByIds(ids)).rejects.toEqual(new Error("DB Error"));
+    });
+
+    it("should return an empty array if no rows are found", async () => {
+      const mockAll = jest.fn((query, params, callback) => callback(null, []));
+      Database.getDb.mockReturnValue({ all: mockAll });
+
+      const ids = [1, 2];
+      const result = await getRowsByIds(ids);
+
+      expect(result).toEqual([]);
+    });
+  });
 });

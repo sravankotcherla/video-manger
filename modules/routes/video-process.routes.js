@@ -1,9 +1,11 @@
 const express = require("express");
 const multer = require("multer");
 const path = require("path");
+
 const UploadVideoController = require("../controllers/uploadVideo.controller");
 const VideoController = require("../controllers/video.controller");
 const VideoTrimController = require("../controllers/videoTrim.controller");
+const VideoMergeController = require("../controllers/merge.controller");
 
 const AuthController = require("../controllers/auth.controller");
 
@@ -40,5 +42,7 @@ app
 app.route("/trim").all(VideoTrimController.trim);
 
 app.route("/link").get(VideoController.getLinkToVideo);
+
+app.route("/merge").post(VideoMergeController.mergeVideos);
 
 module.exports = app;

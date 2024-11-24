@@ -50,3 +50,20 @@ exports.getRowById = (id) => {
     );
   });
 };
+
+exports.getRowsByIds = (ids) => {
+  const placeholders = ids.map(() => "?").join(",");
+
+  const query = `SELECT * FROM videos WHERE id IN (${placeholders})`;
+
+  return new Promise((resolve, reject) => {
+    Database.getDb().all(query, ids, (err, rows) => {
+      if (err) {
+        console.error(err);
+        return reject(err);
+      } else {
+        return resolve(rows);
+      }
+    });
+  });
+};
