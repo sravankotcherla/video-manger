@@ -187,26 +187,6 @@ describe("Video API E2E Tests", () => {
       expect(response.status).toBe(400);
       expect(response.text).toContain("File duration is too large");
     });
-    //   const testLargeVideoPath = path.resolve(
-    //     __dirname,
-    //     "assets/large-video.mp4"
-    //   );
-    //   jest.spyOn(console, "error").mockImplementationOnce(() => {});
-
-    //   if (!fs.existsSync(testLargeVideoPath)) {
-    //     throw new Error(
-    //       "Test large video file not found at " + testLargeVideoPath
-    //     );
-    //   }
-
-    //   const response = await request(server)
-    //     .post("/videos/upload")
-    //     .attach("video", testLargeVideoPath)
-    //     .set("Authorization", `Bearer ${process.env.AUTH_TOKEN}`);
-
-    //   expect(response.status).toBe(400);
-    //   expect(response.text).toContain("File size is too large");
-    // });
   });
 
   describe("Get Link to Video API", () => {
