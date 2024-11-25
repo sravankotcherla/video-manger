@@ -49,13 +49,13 @@ exports.insertVideoMetaData = async (req, res) => {
   try {
     const { filename, path, size, duration } = req.file;
 
-    const createdRowId = await VideoModel.createRow({
+    const createdRow = await VideoModel.createRow({
       filename,
       path,
       size,
       duration,
     });
-    return res.status(200).send({ id: createdRowId });
+    return res.status(200).send({ id: createdRow.id });
   } catch (err) {
     return res
       .status(500)

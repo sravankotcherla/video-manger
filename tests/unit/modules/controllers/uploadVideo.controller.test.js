@@ -121,7 +121,7 @@ describe("Video Controller", () => {
       const res = { status: jest.fn().mockReturnThis(), send: jest.fn() };
       jest.spyOn(console, "error").mockImplementationOnce(() => {});
 
-      VideoModel.createRow.mockResolvedValue(1);
+      VideoModel.createRow.mockResolvedValue({ id: 1 });
 
       await insertVideoMetaData(req, res);
 

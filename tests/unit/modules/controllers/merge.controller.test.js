@@ -78,7 +78,7 @@ describe("mergeVideos", () => {
     ffmpegUtils.mergeVideos.mockResolvedValue(fakeMetaData);
 
     // Mocking VideoModel.createRow to return a fake row ID
-    VideoModel.createRow.mockResolvedValue(1);
+    VideoModel.createRow.mockResolvedValue({ id: 1 });
 
     await mergeVideos(req, res);
 

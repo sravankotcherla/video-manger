@@ -43,13 +43,13 @@ exports.trim = async (req, res) => {
 
     const { size } = await fs.promises.stat(outputFilePath);
 
-    const createdRowId = await VideoModel.createRow({
+    const createdRow = await VideoModel.createRow({
       filename: newFileName,
       path: outputFilePath,
       size,
       duration,
     });
-    return res.status(200).jsonp({ id: createdRowId });
+    return res.status(200).jsonp({ id: createdRow.id });
   } catch (err) {
     console.error(err);
     return res.status(500).send(err.message);

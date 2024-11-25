@@ -32,14 +32,14 @@ exports.mergeVideos = async (req, res) => {
 
     const { size, duration } = newFileMetaData.format;
 
-    const createdRowId = await VideoModel.createRow({
+    const createdRow = await VideoModel.createRow({
       filename: outputFileName,
       path: outputFilePath,
       size,
       duration,
     });
 
-    res.status(200).send({ id: createdRowId });
+    res.status(200).send({ id: createdRow.id });
   } catch (err) {
     console.error(err);
     return res.status(500).send(err.message);
