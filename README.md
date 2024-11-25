@@ -11,7 +11,7 @@ A RESTful Node.js server for handling video upload, processing (trimming, mergin
 - **Video Merging** (`POST /videos/merge`): Combine multiple videos into a single output.
 - **Video Link Generation** (`GET /videos/:id/link`): Generate secure, time-limited download links for videos.
 
----
+For detailed API information, request examples, and sample responses, please refer to the included [Postman Collection](./postman/collection.json)
 
 ## Setup and Installation
 

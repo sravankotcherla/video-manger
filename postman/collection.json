@@ -1,0 +1,153 @@
+{
+  "info": {
+    "_postman_id": "66d12fc5-f5d2-40be-ad33-a34a82a20488",
+    "name": "video-manager",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "23052624"
+  },
+  "item": [
+    {
+      "name": "http://localhost:8080/videos/upload",
+      "request": {
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "formdata",
+          "formdata": [
+            {
+              "key": "video",
+              "type": "file",
+              "src": "/Users/sravan/Documents/SampleVideo_1280x720_2mb.mp4"
+            }
+          ]
+        },
+        "url": {
+          "raw": "http://localhost:8080/videos/upload",
+          "protocol": "http",
+          "host": ["localhost"],
+          "port": "8080",
+          "path": ["videos", "upload"]
+        },
+        "description": "### Upload Video\n\nThis endpoint allows you to upload a video.\n\n#### Request Body\n\n- **video** (file): The video file to be uploaded.\n    \n\n#### Response\n\nUpon successful upload, the response will contain the ID of the uploaded video in JSON format.\n\nExample:\n\n``` json\n{\n    \"id\": 0\n}\n\n ```"
+      },
+      "response": []
+    },
+    {
+      "name": "http://localhost:8080/videos/:id/trim",
+      "request": {
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n    \"start\": 10,\n    \"duration\": 10\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "http://localhost:8080/videos/1/trim",
+          "protocol": "http",
+          "host": ["localhost"],
+          "port": "8080",
+          "path": ["videos", "1", "trim"]
+        },
+        "description": "### Trim Video\n\nThis endpoint allows the user to trim a specific video by providing the start time and duration.\n\n#### Request Body\n\n- `start` (number): The start time in seconds from which the video should be trimmed. It can also be decimals to support millis seconds. Example: 1,2,5.14, 6.143\n    \n- `duration` (number): The duration in seconds for which the video should be trimmed. It can also be decimals to support millis seconds. Example: 10,12,15.14, 16.768.\n    \n\n#### Response\n\nUpon successful trimming, the server responds with a status code of 200 and a JSON object containing the trimmed video's ID.\n\nExample Response Body:\n\n``` json\n{\n    \"id\": 0\n}\n\n ```"
+      },
+      "response": []
+    },
+    {
+      "name": "http://localhost:8080/videos/:id/link",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "http://localhost:8080/videos/8/link",
+          "protocol": "http",
+          "host": ["localhost"],
+          "port": "8080",
+          "path": ["videos", "8", "link"]
+        },
+        "description": "### Request Description\n\nThis endpoint makes an HTTP GET request to retrieve the link for the video with the ID 8.\n\n### Request Body\n\nThis request does not require a request body.\n\n### Response\n\nThe response for this request is a JSON schema and the Content-Type is 'text/html'. The response includes a download link for the video, which is provided as a query parameter 'token' in the URL. The token in the response can be used to authenticate, download the video file and also helps in link's expiry.\n\n### Example Response\n\n``` json\n{\n  \"type\": \"object\",\n  \"properties\": {\n    \"token\": {\n      \"type\": \"string\"\n    }\n  }\n}\n\n ```"
+      },
+      "response": []
+    },
+    {
+      "name": "http://localhost:8080/videos/merge",
+      "request": {
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n    \"ids\": [3,7,2],\n    \"outputFileName\":\"sampleVideo_312.mp4\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "http://localhost:8080/videos/merge",
+          "protocol": "http",
+          "host": ["localhost"],
+          "port": "8080",
+          "path": ["videos", "merge"]
+        },
+        "description": "The `POST /videos/merge` endpoint is used to merge multiple videos into a single video file. The request should be sent with a JSON payload containing an array of video IDs to be merged and the desired output file name.\n\n### Request Body\n\n- `ids` (array of integers): An array of video IDs to be merged.\n    \n- `outputFileName` (string): The name of the output file after merging.\n    \n\n### Response\n\nThe response of this request is a JSON object with the following schema:\n\n``` json\n{\n  \"id\": 0\n}\n\n ```\n\nThis JSON schema represents the response structure where `id` is the identifier for the merged video file."
+      },
+      "response": []
+    },
+    {
+      "name": "http://localhost:8080/videos/download",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "http://localhost:8080/videos/1/link",
+          "protocol": "http",
+          "host": ["localhost"],
+          "port": "8080",
+          "path": ["videos", "1", "link"]
+        },
+        "description": "This endpoint makes an HTTP GET request to download a video using the provided token as authentication. The response returns a video file with a Content-Type of video/mp4.\n\n### Request\n\nThe request does not contain a request body, but it includes the following query parameter:\n\n- token (string, required): The authentication token for accessing the video download.\n    \n\n### Response\n\nThe response does not include a JSON schema as the content is a video file. However, the response status is 200, indicating a successful download, and the Content-Type is video/mp4."
+      },
+      "response": []
+    }
+  ],
+  "auth": {
+    "type": "bearer",
+    "bearer": [
+      {
+        "key": "token",
+        "value": "{{AUTH_TOKEN}}",
+        "type": "string"
+      }
+    ]
+  },
+  "event": [
+    {
+      "listen": "prerequest",
+      "script": {
+        "type": "text/javascript",
+        "packages": {},
+        "exec": [""]
+      }
+    },
+    {
+      "listen": "test",
+      "script": {
+        "type": "text/javascript",
+        "packages": {},
+        "exec": [""]
+      }
+    }
+  ],
+  "variable": [
+    {
+      "key": "AUTH_TOKEN",
+      "value": "dummy",
+      "type": "string"
+    }
+  ]
+}
