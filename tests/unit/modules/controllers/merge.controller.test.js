@@ -51,7 +51,7 @@ describe("mergeVideos", () => {
 
     await mergeVideos(req, res);
 
-    expect(res.status).toHaveBeenCalledWith(500);
+    expect(res.status).toHaveBeenCalledWith(400);
     expect(res.send).toHaveBeenCalledWith("Videos not found");
   });
 

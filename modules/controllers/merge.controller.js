@@ -13,16 +13,23 @@ exports.mergeVideos = async (req, res) => {
 
     const videos = await VideoModel.getRowsByIds(ids);
 
-    const filePathById = videos.reduce(
+    const filePathById = videos?.reduce(
       (accum, video) => ({ ...accum, [video.id]: video.filepath }),
       {}
     );
+
+    let missingFilePath = false;
     const inputFilePaths = ids.map((id) => {
       if (!filePathById[id]) {
-        return res.status(400).send("Videos not found");
+        missingFilePath = true;
       }
       return filePathById[id];
     });
+
+    if (missingFilePath) {
+      return res.status(400).send("Videos not found");
+    }
+
     const outputFilePath = path.resolve("./media", outputFileName);
 
     const newFileMetaData = await ffmpegUtils.mergeVideos(

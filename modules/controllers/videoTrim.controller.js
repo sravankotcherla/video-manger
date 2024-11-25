@@ -35,7 +35,9 @@ exports.trim = async (req, res) => {
 
     const outputFilePath = path.resolve(
       __dirname,
-      `../../${process.env.UPLOAD_FOLDER_NAME}`,
+      process.env.NODE_ENV === "test"
+        ? `../../tests/e2e/${process.env.UPLOAD_FOLDER_NAME}`
+        : `../../${process.env.UPLOAD_FOLDER_NAME}`,
       newFileName
     );
 
