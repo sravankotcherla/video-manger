@@ -14,7 +14,7 @@ if (env === "test") {
 const Database = require("./database");
 const VideoProcessRouter = require("./modules/routes/video-process.routes");
 
-const port = process.env.PORT;
+const port = process.env.PORT || 8080;
 const uploadFolderName = process.env.UPLOAD_FOLDER_NAME || "media";
 const uploadFolderPath =
   env === "test"
